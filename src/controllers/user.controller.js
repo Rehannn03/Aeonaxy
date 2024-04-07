@@ -275,11 +275,55 @@ const changePassword=asyncHandler(async(req,res)=>{
 
 }
 )
+
+const enrollCourse=asyncHandler(async(req,res)=>{
+    const{id}=req.params
+    const user=await User.findById(req.user._id).select("-password -createdAt -updatedAt -refreshToken")
+    if(!user){
+        throw new ApiError(400,"User not found")
+    }
+    if(user.courseTaken.includes(id)){
+        throw new ApiError(400,"You have already enrolled in this course")
+    }
+    
+    user.courseTaken.push(id)
+    user.save()
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            user,
+            "Course enrolled successfully"
+        )
+    )
+})
+
+const viewEnrolledCourses=asyncHandler(async(req,res)=>{
+    const user=await User.findById(req.user._id).select("-password -createdAt -updatedAt -refreshToken")
+    if(!user){
+        throw new ApiError(400,"User not found")
+    }
+    (await user.populate("courseTaken")).$getAllSubdocs()
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            user.courseTaken,
+            "Enrolled courses retrieved successfully"
+        )
+    )
+})
+
 export {
     registerUser,
     verifyEmail,
     loginUser,
     logoutUser,
     viewProfile,
-    updateProfile
+    updateProfile,
+    changePassword,
+    enrollCourse,
+    viewEnrolledCourses
 }

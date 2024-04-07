@@ -21,6 +21,10 @@ const courseSchema=new mongoose.Schema({
         type:String,
         required:true
     },
+    language:{
+        type:String,
+        required:true
+    },
     level:{
         type:String,
         required:true,
@@ -51,4 +55,4 @@ courseSchema.pre('save',function(next){
 
 
 
-export default mongoose.model("Course",courseSchema)
+export const Course = mongoose.model('Course',courseSchema)
